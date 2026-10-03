@@ -1,0 +1,4 @@
+# Used by the GitHub Android build, which only creates the Android platform files.
+flutter_launcher_icons:
+  android: true
+  image_path: "assets/icon.png"

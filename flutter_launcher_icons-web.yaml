@@ -1,0 +1,8 @@
+# Used by the GitHub web build, which only creates the web platform files.
+flutter_launcher_icons:
+  image_path: "assets/icon.png"
+  web:
+    generate: true
+    image_path: "assets/icon.png"
+    background_color: "#FDF1E0"
+    theme_color: "#C81E63"
