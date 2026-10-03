@@ -50,7 +50,7 @@ jobs:
           SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
           SITE_URL: ${{ vars.SITE_URL }}
         run: |
-          ARGS   =(--release --base-href "/")
+          ARGS=(--release --base-href "/")
           [ -n "$SUPABASE_URL" ] && ARGS+=(--dart-define=SUPABASE_URL="$SUPABASE_URL")
           [ -n "$SUPABASE_ANON_KEY" ] && ARGS+=(--dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY")
           [ -n "$SITE_URL" ] && ARGS+=(--dart-define=SITE_URL="$SITE_URL")
