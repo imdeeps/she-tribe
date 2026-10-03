@@ -1,0 +1,55 @@
+name: Build Android APK
+
+# Run it by hand: Actions tab > "Build Android APK" > Run workflow.
+on:
+  workflow_dispatch:
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Add Android platform files
+        run: flutter create --org com.shetribe --project-name she_tribe --platforms=android .
+
+      - name: Make sure the app code was not overwritten
+        run: git diff --exit-code -- lib test pubspec.yaml
+
+      - name: Allow internet access in release builds
+        run: |
+          grep -q 'android.permission.INTERNET' android/app/src/main/AndroidManifest.xml || \
+            sed -i 's#<application#<uses-permission android:name="android.permission.INTERNET"/>\n    <application#' android/app/src/main/AndroidManifest.xml
+
+      - run: flutter pub get
+      - name: App icons
+        run: dart run flutter_launcher_icons -f flutter_launcher_icons-android.yaml
+        continue-on-error: true
+      - run: flutter test
+
+      - name: Build
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: |
+          ARGS=(--release)
+          [ -n "$SUPABASE_URL" ] && ARGS+=(--dart-define=SUPABASE_URL="$SUPABASE_URL")
+          [ -n "$SUPABASE_ANON_KEY" ] && ARGS+=(--dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY")
+          [ -n "$SITE_URL" ] && ARGS+=(--dart-define=SITE_URL="$SITE_URL")
+          flutter build apk "${ARGS[@]}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: she-tribe-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
