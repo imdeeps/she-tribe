@@ -93,6 +93,11 @@ class _ShellState extends State<Shell> with WidgetsBindingObserver {
           bottomNavigationBar: NavigationBar(
             selectedIndex: index,
             onDestinationSelected: app.setTab,
+            // With the extra admin tab there are six items, which are too many
+            // to label on a phone, so only the selected one shows its label.
+            labelBehavior: items.length > 5
+                ? NavigationDestinationLabelBehavior.onlyShowSelected
+                : NavigationDestinationLabelBehavior.alwaysShow,
             destinations: [
               for (final it in items)
                 NavigationDestination(
@@ -100,7 +105,7 @@ class _ShellState extends State<Shell> with WidgetsBindingObserver {
                       ? Badge(label: Text('${app.pending.length}'), child: Icon(it.$1))
                       : Icon(it.$1),
                   selectedIcon: Icon(it.$2, color: Brand.accent),
-                  label: it.$3,
+                  label: it.$3 == 'Membership' ? 'Plans' : it.$3,
                 ),
             ],
           ),
