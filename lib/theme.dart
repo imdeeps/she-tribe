@@ -67,6 +67,9 @@ ThemeData buildTheme() {
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: Brand.card,
       indicatorColor: Brand.blush,
+      labelTextStyle: WidgetStatePropertyAll(
+        GoogleFonts.dmSans(fontSize: 11, fontWeight: FontWeight.w600, color: Brand.ink),
+      ),
     ),
   );
 }
