@@ -16,7 +16,7 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  final _phone = TextEditingController();
+  final _email = TextEditingController();
   final _code = TextEditingController();
   bool _codeSent = false;
   bool _busy = false;
@@ -24,7 +24,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   void dispose() {
-    _phone.dispose();
+    _email.dispose();
     _code.dispose();
     super.dispose();
   }
@@ -43,26 +43,27 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  String? get _mobile => cleanIndianMobile(_phone.text);
+  String get _addr => _email.text.trim().toLowerCase();
+  bool get _validEmail => RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(_addr);
 
   Future<void> _sendCode() async {
-    if (_mobile == null) {
-      setState(() => _error = 'Please enter your 10-digit WhatsApp number.');
+    if (!_validEmail) {
+      setState(() => _error = 'Please enter a valid email address.');
       return;
     }
     await _run(() async {
-      await context.read<AppState>().sendCode('+91$_mobile');
+      await context.read<AppState>().sendCode(_addr);
       if (mounted) setState(() => _codeSent = true);
     });
   }
 
   Future<void> _verify() async {
     final code = _code.text.trim();
-    if (code.length < 4) {
-      setState(() => _error = 'Enter the code from WhatsApp.');
+    if (code.length < 6) {
+      setState(() => _error = 'Enter the code from your email.');
       return;
     }
-    await _run(() => context.read<AppState>().verifyCode('+91$_mobile', code));
+    await _run(() => context.read<AppState>().verifyCode(_addr, code));
   }
 
   @override
@@ -92,21 +93,17 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                   const SizedBox(height: 28),
                   TextField(
-                    controller: _phone,
+                    controller: _email,
                     enabled: !_codeSent && !_busy,
-                    keyboardType: TextInputType.phone,
-                    autofillHints: const [AutofillHints.telephoneNumberNational],
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(10),
-                    ],
+                    keyboardType: TextInputType.emailAddress,
+                    autofillHints: const [AutofillHints.email],
                     decoration: fieldDecoration(
-                      'WhatsApp number',
-                      hint: '98765 43210',
+                      'Email address',
+                      hint: 'you@example.com',
                       helper: _codeSent
                           ? null
-                          : 'We\u2019ll send a sign-in code on WhatsApp.',
-                    ).copyWith(prefixText: '+91  '),
+                          : 'We\u2019ll email you a sign-in code.',
+                    ),
                     onSubmitted: (_) => _codeSent ? null : _sendCode(),
                   ),
                   if (_codeSent) ...[
@@ -120,10 +117,10 @@ class _AuthScreenState extends State<AuthScreen> {
                         LengthLimitingTextInputFormatter(10),
                       ],
                       decoration: fieldDecoration(
-                        'Code from WhatsApp',
+                        'Code from your email',
                         helper: Config.isDemo
                             ? 'Demo mode: use the dummy code ${Config.demoCode}'
-                            : 'Check WhatsApp on +91 ${_phone.text}',
+                            : 'Check your inbox (and spam) for $_addr',
                       ),
                       onSubmitted: (_) => _verify(),
                     ),
@@ -156,7 +153,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                     _code.clear();
                                     _error = null;
                                   }),
-                          child: const Text('Change number'),
+                          child: const Text('Change email'),
                         ),
                       ],
                     ),

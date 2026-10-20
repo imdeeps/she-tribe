@@ -53,7 +53,7 @@ class MeScreen extends StatelessWidget {
               if (app.phone != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 2),
-                  child: Text('WhatsApp ${app.phone}', style: Brand.body(14)),
+                  child: Text(app.phone!, style: Brand.body(14)),
                 ),
               const SizedBox(height: 12),
               Wrap(
