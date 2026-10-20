@@ -9,7 +9,7 @@ abstract class Backend {
   String? get userId;
   Stream<void> get authChanges;
 
-  /// [phone] is a full number such as +919876543210. The code arrives on WhatsApp.
+  /// The 6-digit code arrives by email.
   Future<void> sendCode(String phone);
   Future<void> verifyCode(String phone, String code);
   Future<void> signInDemo();
@@ -66,29 +66,23 @@ class SupabaseBackend implements Backend {
   Stream<void> get authChanges => _c.auth.onAuthStateChange.map((_) {});
 
   @override
-  Future<void> sendCode(String phone) async {
+  Future<void> sendCode(String email) async {
     try {
-      await _c.functions.invoke('send-otp', body: {'phone': phone});
-    } on FunctionException catch (e) {
-      throw Exception(_functionMessage(e));
+      await _c.auth.signInWithOtp(email: email, shouldCreateUser: true);
+    } on AuthException catch (e) {
+      throw Exception(e.statusCode == '429'
+          ? 'Too many tries. Please wait a minute and try again.'
+          : 'Could not send the code. Please check the email and try again.');
     }
   }
 
   @override
-  Future<void> verifyCode(String phone, String code) async {
-    String? tokenHash;
+  Future<void> verifyCode(String email, String code) async {
     try {
-      final res = await _c.functions
-          .invoke('verify-otp', body: {'phone': phone, 'code': code});
-      final data = res.data;
-      if (data is Map && data['token_hash'] != null) {
-        tokenHash = data['token_hash'].toString();
-      }
-    } on FunctionException catch (e) {
-      throw Exception(_functionMessage(e));
+      await _c.auth.verifyOTP(email: email, token: code, type: OtpType.email);
+    } on AuthException {
+      throw Exception('That code is not right or has expired. Please try again.');
     }
-    if (tokenHash == null) throw Exception('Sign-in failed. Please try again.');
-    await _c.auth.verifyOTP(tokenHash: tokenHash, type: OtpType.email);
   }
 
   @override
@@ -145,14 +139,7 @@ class SupabaseBackend implements Backend {
   }
 
   @override
-  Future<String?> myPhone() async {
-    final row = await _c
-        .from('phone_accounts')
-        .select('phone')
-        .eq('user_id', _uid)
-        .maybeSingle();
-    return row?['phone']?.toString();
-  }
+  Future<String?> myPhone() async => _c.auth.currentUser?.email;
 
   @override
   Future<List<Plan>> plans() async {
@@ -380,7 +367,7 @@ class DemoBackend implements Backend {
 
   @override
   Future<void> signInDemo() async {
-    _phone = '+919999900000';
+    _phone = 'demo@shetribe.in';
     _uid = 'demo-user';
   }
 
