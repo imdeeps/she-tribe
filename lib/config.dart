@@ -23,5 +23,6 @@ class Config {
   /// Dummy sign-in code used in demo mode (and for test numbers on the server).
   static const demoCode = '123456';
 
-  static String get privacyUrl => '$siteUrl/privacy.html';
+  static const privacyUrl =
+      'https://shetribe.vercel.app/#:~:text=agree%20to%20our-,Privacy%20Policy';
 }
