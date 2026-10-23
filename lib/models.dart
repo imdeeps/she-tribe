@@ -192,6 +192,9 @@ class Registration {
 
   bool get isPaid => status == 'paid';
 
+  /// Short ticket number shown on the ticket and in the confirmation email.
+  String get code => 'ST-${id.replaceAll('-', '').substring(0, 8).toUpperCase()}';
+
   factory Registration.fromMap(Map<String, dynamic> m) => Registration(
         id: m['id'].toString(),
         eventId: m['event_id'].toString(),

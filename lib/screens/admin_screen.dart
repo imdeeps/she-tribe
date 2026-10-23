@@ -36,8 +36,15 @@ class _AdminScreenState extends State<AdminScreen> {
     }
     setState(() => _busyId = p.id);
     try {
-      await app.reviewPayment(p.id, approve);
-      if (mounted) snack(context, approve ? 'Approved' : 'Rejected');
+      final warning = await app.reviewPayment(p.id, approve, email: p.kind == 'ticket');
+      if (mounted) {
+        snack(
+            context,
+            warning ??
+                (approve
+                    ? (p.kind == 'ticket' ? 'Approved. Confirmation email sent.' : 'Approved')
+                    : 'Rejected'));
+      }
     } catch (e) {
       if (mounted) snack(context, errorText(e));
     } finally {

@@ -6,6 +6,7 @@ import '../models.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
 import 'events_screen.dart';
+import 'ticket_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -118,7 +119,11 @@ class _NextEventCard extends StatelessWidget {
           const SizedBox(height: 18),
           FilledButton(
             onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => EventDetailScreen(eventId: event.id)),
+              MaterialPageRoute<void>(
+                builder: (_) => registered
+                    ? TicketScreen(eventId: event.id)
+                    : EventDetailScreen(eventId: event.id),
+              ),
             ),
             child: Text(registered ? 'View your ticket' : 'Reserve your seat'),
           ),

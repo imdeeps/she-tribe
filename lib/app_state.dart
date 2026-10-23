@@ -223,9 +223,20 @@ class AppState extends ChangeNotifier {
     await refresh();
   }
 
-  Future<void> reviewPayment(String paymentId, bool approve) async {
+  /// Returns a warning message if the approval worked but the confirmation
+  /// email could not be sent, otherwise null.
+  Future<String?> reviewPayment(String paymentId, bool approve, {bool email = false}) async {
     await backend.reviewPayment(paymentId: paymentId, approve: approve);
+    String? warning;
+    if (approve && email) {
+      try {
+        await backend.sendTicketEmail(paymentId);
+      } catch (e) {
+        warning = 'Approved, but the confirmation email was not sent: ${_clean(e)}';
+      }
+    }
     await refresh();
+    return warning;
   }
 
   Future<void> addPost(String kind, String text) async {

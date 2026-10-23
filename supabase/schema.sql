@@ -462,3 +462,17 @@ select ev.id, t.name, t.price, t.perks from ev,
 -- Make yourself the admin AFTER you have signed in once with your WhatsApp number:
 --   insert into public.admins (user_id)
 --   select user_id from public.phone_accounts where phone = '+91XXXXXXXXXX';
+
+-- ---------------------------------------------------------------------------
+-- Added later (already applied to the live project):
+-- confirmation email tracking, and an optional private WhatsApp number.
+alter table public.payments add column if not exists confirmation_sent_at timestamptz;
+
+create table if not exists public.member_contacts (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  whatsapp text not null,
+  consent_at timestamptz not null default now()
+);
+alter table public.member_contacts enable row level security;
+-- No direct table access: members use my_whatsapp() / save_whatsapp() only.
+-- (See the functions of the same name in the Supabase project.)

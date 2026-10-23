@@ -6,6 +6,7 @@ import '../models.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
 import 'pay_screen.dart';
+import 'ticket_screen.dart';
 
 class EventsScreen extends StatelessWidget {
   const EventsScreen({super.key});
@@ -225,8 +226,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     Widget action;
     if (paid) {
       action = FilledButton(
-        onPressed: null,
-        child: Text(mine ? 'Your ticket' : 'Already registered'),
+        onPressed: mine
+            ? () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => TicketScreen(eventId: event.id)),
+                )
+            : null,
+        child: Text(mine ? 'View your ticket' : 'Already registered'),
       );
     } else if (open != null) {
       action = FilledButton(

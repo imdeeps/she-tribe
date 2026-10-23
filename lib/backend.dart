@@ -39,6 +39,7 @@ abstract class Backend {
   Future<bool> amIAdmin();
   Future<List<AdminPayment>> pendingPayments();
   Future<void> reviewPayment({required String paymentId, required bool approve});
+  Future<void> sendTicketEmail(String paymentId);
 
   Future<List<Profile>> directory();
   Future<List<Post>> posts();
@@ -242,6 +243,15 @@ class SupabaseBackend implements Backend {
           AdminPayment.fromMap(Map<String, dynamic>.from(r as Map)),
       ];
     });
+  }
+
+  @override
+  Future<void> sendTicketEmail(String paymentId) async {
+    try {
+      await _c.functions.invoke('send-ticket-email', body: {'payment_id': paymentId});
+    } on FunctionException catch (e) {
+      throw Exception(_functionMessage(e));
+    }
   }
 
   @override
@@ -633,6 +643,9 @@ class DemoBackend implements Backend {
             submittedAt: p.createdAt,
           ),
       ];
+
+  @override
+  Future<void> sendTicketEmail(String paymentId) async {}
 
   @override
   Future<void> reviewPayment({required String paymentId, required bool approve}) async {
