@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -7,6 +8,7 @@ import 'backend.dart';
 import 'config.dart';
 import 'screens/auth_screen.dart';
 import 'screens/profile_setup_screen.dart';
+import 'screens/public_ticket_screen.dart';
 import 'screens/shell.dart';
 import 'theme.dart';
 
@@ -27,6 +29,13 @@ Future<void> main() async {
   );
 }
 
+/// A private ticket link looks like https://app.shetribe.in/?t=TOKEN
+String? get _ticketToken {
+  if (!kIsWeb || Config.isDemo) return null;
+  final t = Uri.base.queryParameters['t'];
+  return (t == null || t.length < 20) ? null : t;
+}
+
 class SheTribeApp extends StatelessWidget {
   const SheTribeApp({super.key});
 
@@ -36,7 +45,7 @@ class SheTribeApp extends StatelessWidget {
       title: 'She Tribe',
       debugShowCheckedModeBanner: false,
       theme: buildTheme(),
-      home: const Root(),
+      home: _ticketToken == null ? const Root() : PublicTicketScreen(token: _ticketToken!),
     );
   }
 }

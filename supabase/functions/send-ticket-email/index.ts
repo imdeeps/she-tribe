@@ -76,6 +76,7 @@ Deno.serve(async (req) => {
 
     const name = (prof?.full_name ?? "").trim() || "there";
     const code = ticketCode(reg.id);
+    const ticketUrl = reg.ticket_token ? `${APP_URL}/?t=${reg.ticket_token}` : APP_URL;
     const rows: [string, string][] = [
       ["Event", ev?.title ?? ""],
       ["Date and time", when(ev?.starts_at ?? null)],
@@ -95,14 +96,14 @@ Deno.serve(async (req) => {
 <div style="padding:26px;color:#2a1421">
 <p style="font-size:16px;margin:0 0 14px">Hi ${esc(name)}, your payment is confirmed and your seat is booked.</p>
 <table style="width:100%;border-collapse:collapse">${table}</table>
-<p style="font-size:15px;line-height:1.5;margin:18px 0">Open your ticket any time in the app and show the QR code at the entrance.</p>
-<p style="margin:0 0 20px"><a href="${esc(APP_URL)}" style="display:inline-block;background:#c81e63;color:#fff;text-decoration:none;font-weight:700;padding:14px 26px;border-radius:999px">View my ticket</a></p>
+<p style="font-size:15px;line-height:1.5;margin:18px 0">Tap the button to open your ticket. Show the QR code at the entrance.</p>
+<p style="margin:0 0 20px"><a href="${esc(ticketUrl)}" style="display:inline-block;background:#c81e63;color:#fff;text-decoration:none;font-weight:700;padding:14px 26px;border-radius:999px">View my ticket</a></p>
 <p style="font-size:13px;color:#7a5a6a;margin:0">Questions? Call or WhatsApp ${esc(CONTACT)}.</p>
 </div></div></div>`;
 
     const text = `Hi ${name}, your payment is confirmed and your seat is booked.\n\n` +
       rows.map(([k, v]) => `${k}: ${v}`).join("\n") +
-      `\n\nOpen your ticket in the app: ${APP_URL}\nQuestions? Call or WhatsApp ${CONTACT}.`;
+      `\n\nYour ticket: ${ticketUrl}\nQuestions? Call or WhatsApp ${CONTACT}.`;
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",

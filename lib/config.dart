@@ -9,6 +9,10 @@ class Config {
   static const siteUrl =
       String.fromEnvironment('SITE_URL', defaultValue: 'https://shetribe.example.com');
 
+  /// Where the app lives; used in ticket links.
+  static const appUrl =
+      String.fromEnvironment('APP_URL', defaultValue: 'https://app.shetribe.in');
+
   /// Set true for App Store / Play Store builds. Store rules generally require
   /// their own billing for in-app digital memberships (and Apple names QR codes
   /// specifically), so in store builds the app does not sell memberships.

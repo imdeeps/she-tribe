@@ -181,6 +181,7 @@ class Registration {
   final String tierId;
   final String status; // pending | paid | cancelled
   final int amountInr;
+  final String ticketToken;
 
   const Registration({
     required this.id,
@@ -188,6 +189,7 @@ class Registration {
     required this.tierId,
     required this.status,
     required this.amountInr,
+    this.ticketToken = '',
   });
 
   bool get isPaid => status == 'paid';
@@ -201,6 +203,7 @@ class Registration {
         tierId: m['tier_id'].toString(),
         status: (m['status'] ?? 'pending').toString(),
         amountInr: (m['amount_inr'] as num?)?.toInt() ?? 0,
+        ticketToken: (m['ticket_token'] ?? '').toString(),
       );
 }
 

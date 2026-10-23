@@ -479,3 +479,6 @@ alter table public.member_contacts enable row level security;
 
 -- Admin list of recently approved tickets, with whether the email was sent
 -- (function list_recent_approved_tickets(), already applied to the live project).
+
+-- Private ticket links: registrations.ticket_token and get_public_ticket(p_token)
+-- (already applied to the live project).
