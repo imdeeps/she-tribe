@@ -19,6 +19,8 @@ abstract class Backend {
   Future<Profile?> myProfile();
   Future<void> saveProfile(Profile p);
   Future<String?> myPhone();
+  Future<String?> myWhatsapp();
+  Future<void> saveWhatsapp(String number);
 
   Future<List<TribeEvent>> events();
   Future<List<Registration>> myRegistrations();
@@ -140,6 +142,22 @@ class SupabaseBackend implements Backend {
 
   @override
   Future<String?> myPhone() async => _c.auth.currentUser?.email;
+
+  @override
+  Future<String?> myWhatsapp() async {
+    final r = await _c.rpc('my_whatsapp');
+    final s = r?.toString() ?? '';
+    return s.isEmpty ? null : s;
+  }
+
+  @override
+  Future<void> saveWhatsapp(String number) async {
+    try {
+      await _c.rpc('save_whatsapp', params: {'p_number': number});
+    } on PostgrestException catch (e) {
+      throw Exception(e.message);
+    }
+  }
 
   @override
   Future<List<Plan>> plans() async {
@@ -393,6 +411,14 @@ class DemoBackend implements Backend {
 
   @override
   Future<String?> myPhone() async => _phone;
+
+  String? _whatsapp;
+
+  @override
+  Future<String?> myWhatsapp() async => _whatsapp;
+
+  @override
+  Future<void> saveWhatsapp(String number) async => _whatsapp = number;
 
   @override
   Future<List<TribeEvent>> events() async => const [

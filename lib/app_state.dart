@@ -28,6 +28,7 @@ class AppState extends ChangeNotifier {
   List<AdminPayment> pending = [];
   bool isAdmin = false;
   String? phone;
+  String? whatsapp;
   int tab = 0;
   String? error;
 
@@ -115,6 +116,7 @@ class AppState extends ChangeNotifier {
       backend.paymentSettings(),
       backend.amIAdmin(),
       backend.myPhone(),
+      backend.myWhatsapp(),
     ]);
     events = r[0] as List<TribeEvent>;
     registrations = r[1] as List<Registration>;
@@ -127,6 +129,7 @@ class AppState extends ChangeNotifier {
     paymentSettings = r[8] as PaymentSettings;
     isAdmin = r[9] as bool;
     phone = r[10] as String?;
+    whatsapp = r[11] as String?;
     pending = isAdmin ? await backend.pendingPayments() : <AdminPayment>[];
   }
 
@@ -146,6 +149,12 @@ class AppState extends ChangeNotifier {
 
   void setTab(int i) {
     tab = i;
+    notifyListeners();
+  }
+
+  Future<void> saveWhatsapp(String mobile) async {
+    await backend.saveWhatsapp('+91$mobile');
+    whatsapp = '+91$mobile';
     notifyListeners();
   }
 
@@ -191,6 +200,7 @@ class AppState extends ChangeNotifier {
     pending = [];
     isAdmin = false;
     phone = null;
+    whatsapp = null;
     tab = 0;
     stage = AppStage.signedOut;
     notifyListeners();
