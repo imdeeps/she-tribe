@@ -26,6 +26,7 @@ class AppState extends ChangeNotifier {
   PaymentSettings paymentSettings = const PaymentSettings(upiId: '');
   List<PaymentRequest> payments = [];
   List<AdminPayment> pending = [];
+  List<AdminPayment> approvedTickets = [];
   bool isAdmin = false;
   String? phone;
   String? whatsapp;
@@ -131,6 +132,7 @@ class AppState extends ChangeNotifier {
     phone = r[10] as String?;
     whatsapp = r[11] as String?;
     pending = isAdmin ? await backend.pendingPayments() : <AdminPayment>[];
+    approvedTickets = isAdmin ? await backend.recentApprovedTickets() : <AdminPayment>[];
   }
 
   /// Pull-to-refresh and when returning from the payment page.
@@ -198,6 +200,7 @@ class AppState extends ChangeNotifier {
     commitment = const Commitment();
     payments = [];
     pending = [];
+    approvedTickets = [];
     isAdmin = false;
     phone = null;
     whatsapp = null;
@@ -220,6 +223,12 @@ class AppState extends ChangeNotifier {
 
   Future<void> submitPayment(String paymentId, String utr) async {
     await backend.submitPayment(paymentId: paymentId, utr: utr);
+    await refresh();
+  }
+
+  /// Sends the confirmation email again (admin only).
+  Future<void> resendTicketEmail(String paymentId) async {
+    await backend.sendTicketEmail(paymentId, resend: true);
     await refresh();
   }
 

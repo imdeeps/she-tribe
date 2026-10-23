@@ -52,6 +52,18 @@ class _AdminScreenState extends State<AdminScreen> {
     }
   }
 
+  Future<void> _resend(AppState app, AdminPayment p) async {
+    setState(() => _busyId = p.id);
+    try {
+      await app.resendTicketEmail(p.id);
+      if (mounted) snack(context, 'Confirmation email sent.');
+    } catch (e) {
+      if (mounted) snack(context, errorText(e));
+    } finally {
+      if (mounted) setState(() => _busyId = null);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppState>();
@@ -112,6 +124,35 @@ class _AdminScreenState extends State<AdminScreen> {
               ),
             ),
           ),
+        if (app.approvedTickets.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          Text('Recently approved tickets', style: Brand.display(22, weight: FontWeight.w700)),
+          const SizedBox(height: 10),
+          for (final p in app.approvedTickets)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: SoftCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(p.payerName.isEmpty ? p.payerPhone : p.payerName,
+                        style: Brand.body(16, weight: FontWeight.w700, color: Brand.ink)),
+                    const SizedBox(height: 2),
+                    Text('${p.label} \u00B7 ${formatInr(p.amountInr)}', style: Brand.body(14)),
+                    _line('Contact', p.payerPhone),
+                    _line('Email', p.emailSent ? 'Confirmation sent' : 'Not sent yet'),
+                    const SizedBox(height: 10),
+                    OutlinedButton(
+                      onPressed: _busyId == p.id ? null : () => _resend(app, p),
+                      child: Text(_busyId == p.id
+                          ? 'Sending...'
+                          : (p.emailSent ? 'Resend email' : 'Send confirmation email')),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
       ],
     );
   }

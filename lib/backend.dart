@@ -39,7 +39,8 @@ abstract class Backend {
   Future<bool> amIAdmin();
   Future<List<AdminPayment>> pendingPayments();
   Future<void> reviewPayment({required String paymentId, required bool approve});
-  Future<void> sendTicketEmail(String paymentId);
+  Future<void> sendTicketEmail(String paymentId, {bool resend = false});
+  Future<List<AdminPayment>> recentApprovedTickets();
 
   Future<List<Profile>> directory();
   Future<List<Post>> posts();
@@ -246,9 +247,21 @@ class SupabaseBackend implements Backend {
   }
 
   @override
-  Future<void> sendTicketEmail(String paymentId) async {
+  Future<List<AdminPayment>> recentApprovedTickets() {
+    return _rpc(() async {
+      final rows = await _c.rpc('list_recent_approved_tickets');
+      return [
+        for (final r in (rows as List))
+          AdminPayment.fromMap(Map<String, dynamic>.from(r as Map)),
+      ];
+    });
+  }
+
+  @override
+  Future<void> sendTicketEmail(String paymentId, {bool resend = false}) async {
     try {
-      await _c.functions.invoke('send-ticket-email', body: {'payment_id': paymentId});
+      await _c.functions.invoke('send-ticket-email',
+          body: {'payment_id': paymentId, 'resend': resend});
     } on FunctionException catch (e) {
       throw Exception(_functionMessage(e));
     }
@@ -645,7 +658,10 @@ class DemoBackend implements Backend {
       ];
 
   @override
-  Future<void> sendTicketEmail(String paymentId) async {}
+  Future<List<AdminPayment>> recentApprovedTickets() async => [];
+
+  @override
+  Future<void> sendTicketEmail(String paymentId, {bool resend = false}) async {}
 
   @override
   Future<void> reviewPayment({required String paymentId, required bool approve}) async {

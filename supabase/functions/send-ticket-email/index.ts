@@ -58,12 +58,12 @@ Deno.serve(async (req) => {
     const key = Deno.env.get("RESEND_API_KEY");
     if (!key) return json({ error: "Email is not set up yet (RESEND_API_KEY is missing)." }, 500);
 
-    const { payment_id } = await req.json();
+    const { payment_id, resend } = await req.json();
     const { data: pay } = await admin.from("payments").select("*").eq("id", payment_id).single();
     if (!pay || pay.kind !== "ticket" || pay.status !== "approved" || !pay.registration_id) {
       return json({ error: "That payment is not an approved ticket." }, 400);
     }
-    if (pay.confirmation_sent_at) return json({ ok: true, already: true });
+    if (pay.confirmation_sent_at && resend !== true) return json({ ok: true, already: true });
 
     const { data: reg } = await admin.from("registrations").select("*").eq("id", pay.registration_id).single();
     if (!reg) return json({ error: "Registration not found." }, 400);

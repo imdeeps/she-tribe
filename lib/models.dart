@@ -402,6 +402,7 @@ class AdminPayment {
   final String payerName;
   final String payerPhone;
   final DateTime? submittedAt;
+  final bool emailSent;
 
   const AdminPayment({
     required this.id,
@@ -413,6 +414,7 @@ class AdminPayment {
     required this.payerName,
     required this.payerPhone,
     this.submittedAt,
+    this.emailSent = false,
   });
 
   factory AdminPayment.fromMap(Map<String, dynamic> m) => AdminPayment(
@@ -427,6 +429,7 @@ class AdminPayment {
         submittedAt: m['submitted_at'] == null
             ? null
             : DateTime.tryParse(m['submitted_at'].toString())?.toLocal(),
+        emailSent: m['email_sent'] == true,
       );
 }
 

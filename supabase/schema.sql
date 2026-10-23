@@ -476,3 +476,6 @@ create table if not exists public.member_contacts (
 alter table public.member_contacts enable row level security;
 -- No direct table access: members use my_whatsapp() / save_whatsapp() only.
 -- (See the functions of the same name in the Supabase project.)
+
+-- Admin list of recently approved tickets, with whether the email was sent
+-- (function list_recent_approved_tickets(), already applied to the live project).
