@@ -79,7 +79,7 @@ class _AdminScreenState extends State<AdminScreen> {
                   Text(p.label, style: Brand.body(16, weight: FontWeight.w600, color: Brand.ink)),
                   const SizedBox(height: 10),
                   _line('Name', p.payerName.isEmpty ? 'Not set' : p.payerName),
-                  _line('Email', p.payerPhone),
+                  _line('Contact', p.payerPhone),
                   _line('Transaction ID', p.utr),
                   _line('Note on payment', p.reference),
                   if (p.submittedAt != null) _line('Submitted', formatDate(p.submittedAt)),

@@ -9,6 +9,7 @@ import '../config.dart';
 import '../models.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
+import '../widgets/whatsapp_ask.dart';
 
 /// Pay by scanning a UPI QR with Google Pay (or any UPI app), then enter the
 /// transaction ID so the She Tribe team can confirm it.
@@ -104,6 +105,11 @@ class _PayScreenState extends State<PayScreen> {
           _statusCard(Icons.check_circle, 'Payment confirmed',
               'Thank you! You\u2019re all set.'),
           const SizedBox(height: 16),
+          const WhatsappAsk(
+            title: 'Want your event details on WhatsApp?',
+            body: 'We\u2019ll send your venue, timing and reminders there, so you don\u2019t have to hunt through emails.',
+          ),
+          const SizedBox(height: 16),
           FilledButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Done')),
         ];
       case 'submitted':
@@ -116,6 +122,11 @@ class _PayScreenState extends State<PayScreen> {
           const SizedBox(height: 12),
           Text('Reference ${pay.reference} \u00B7 Transaction ID ${pay.utr ?? ''}',
               style: Brand.body(14)),
+          const SizedBox(height: 16),
+          const WhatsappAsk(
+            title: 'Get your ticket update on WhatsApp',
+            body: 'We\u2019ll message you the moment your payment is confirmed, plus the venue and timing before the event.',
+          ),
           const SizedBox(height: 16),
           FilledButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Back to the app')),
           ..._support(settings),
