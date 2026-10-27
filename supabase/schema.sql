@@ -455,7 +455,7 @@ insert into public.ticket_tiers (event_id, name, price_inr, perks)
 select ev.id, t.name, t.price, t.perks from ev,
   (values
     ('Early Bird', 499,  array['Entry to the First Circle','Welcome gift','SHE TRIBE card']),
-    ('Regular',    799,  array['Entry to the First Circle','Welcome gift','SHE TRIBE card']),
+    ('Regular',    699,  array['Entry to the First Circle','Welcome gift','SHE TRIBE card']),
     ('Premium',    1499, array['Professional headshot','5-minute business spotlight','Priority networking','Business directory listing'])
   ) as t(name, price, perks);
 

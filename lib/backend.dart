@@ -464,11 +464,7 @@ class DemoBackend implements Backend {
           description:
               'An intimate, interactive meet-up for women who are building, growing or dreaming of building something of their own. You do not need a business to belong.',
           highlights: [
-            'Meet women who are building, growing or dreaming',
-            'Real conversations, not small talk',
-            'Leave with new friends and fresh ideas',
-            'A warm, welcoming circle in Chennai',
-            'A few surprises waiting inside',
+            'A warm, relaxed meet-up in Chennai for women who are building, growing or dreaming of something of their own. Come for real conversations, leave with new friends and fresh ideas. A few surprises are waiting inside.',
           ],
           venue: 'Venue to be announced \u00B7 Chennai',
           capacity: 50,
@@ -482,7 +478,7 @@ class DemoBackend implements Backend {
             TicketTier(
               id: 't2',
               name: 'Regular',
-              priceInr: 799,
+              priceInr: 699,
               perks: ['Entry to the First Circle', 'Welcome gift', 'SHE TRIBE card'],
             ),
             TicketTier(

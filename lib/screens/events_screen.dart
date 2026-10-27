@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -191,7 +193,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       if (event.highlights.isNotEmpty) ...[
         const SizedBox(height: 24),
         Text('What to expect', style: Brand.display(24)),
-        for (final h in event.highlights) PerkRow(h),
+        const SizedBox(height: 8),
+        Text(event.highlights.join(' '), style: Brand.body(17, height: 1.6)),
       ],
       const SizedBox(height: 28),
       Text('Tickets', style: Brand.display(24)),
@@ -231,7 +234,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   MaterialPageRoute<void>(builder: (_) => TicketScreen(eventId: event.id)),
                 )
             : null,
-        child: Text(mine ? 'View your ticket' : 'Already registered'),
+        child: Text(mine ? 'View your ticket' : 'Reserve Seat'),
       );
     } else if (open != null) {
       action = FilledButton(
@@ -266,7 +269,21 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             ],
           ),
           const SizedBox(height: 6),
-          for (final p in t.perks) PerkRow(p),
+          if (t.name == 'Premium')
+            // The perks stay a surprise until you are inside.
+            ExcludeSemantics(
+              child: ClipRect(
+                child: ImageFiltered(
+                  imageFilter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [for (final p in t.perks) PerkRow(p)],
+                  ),
+                ),
+              ),
+            )
+          else
+            for (final p in t.perks) PerkRow(p),
           const SizedBox(height: 18),
           SizedBox(width: double.infinity, child: action),
         ],
