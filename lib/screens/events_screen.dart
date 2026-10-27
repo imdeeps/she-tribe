@@ -190,7 +190,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       ],
       if (event.highlights.isNotEmpty) ...[
         const SizedBox(height: 24),
-        Text('What happens', style: Brand.display(24)),
+        Text('What to expect', style: Brand.display(24)),
         for (final h in event.highlights) PerkRow(h),
       ],
       const SizedBox(height: 28),
