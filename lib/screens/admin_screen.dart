@@ -5,6 +5,7 @@ import '../app_state.dart';
 import '../models.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
+import 'payments_history_screen.dart';
 
 /// Only shown to admins. Check each payment against your Google Pay history,
 /// then approve or reject it.
@@ -73,6 +74,13 @@ class _AdminScreenState extends State<AdminScreen> {
           'Open Google Pay, find the payment with the same amount and transaction ID, then approve it here.',
       onRefresh: app.refresh,
       children: [
+        OutlinedButton.icon(
+          onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const PaymentsHistoryScreen())),
+          icon: const Icon(Icons.receipt_long_outlined),
+          label: const Text('View all payments'),
+        ),
+        const SizedBox(height: 14),
         if (app.pending.isEmpty)
           SoftCard(
             child: Text('Nothing waiting. New payments appear here once members submit their transaction ID.',
@@ -140,6 +148,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     const SizedBox(height: 2),
                     Text('${p.label} \u00B7 ${formatInr(p.amountInr)}', style: Brand.body(14)),
                     _line('Contact', p.payerPhone),
+                    if (p.submittedAt != null) _line('Paid on', formatDate(p.submittedAt)),
                     _line('Email', p.emailSent ? 'Confirmation sent' : 'Not sent yet'),
                     const SizedBox(height: 10),
                     OutlinedButton(

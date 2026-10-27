@@ -41,6 +41,7 @@ abstract class Backend {
   Future<void> reviewPayment({required String paymentId, required bool approve});
   Future<void> sendTicketEmail(String paymentId, {bool resend = false});
   Future<List<AdminPayment>> recentApprovedTickets();
+  Future<List<AdminPayment>> allPayments();
 
   Future<List<Profile>> directory();
   Future<List<Post>> posts();
@@ -250,6 +251,17 @@ class SupabaseBackend implements Backend {
   Future<List<AdminPayment>> recentApprovedTickets() {
     return _rpc(() async {
       final rows = await _c.rpc('list_recent_approved_tickets');
+      return [
+        for (final r in (rows as List))
+          AdminPayment.fromMap(Map<String, dynamic>.from(r as Map)),
+      ];
+    });
+  }
+
+  @override
+  Future<List<AdminPayment>> allPayments() {
+    return _rpc(() async {
+      final rows = await _c.rpc('list_all_payments');
       return [
         for (final r in (rows as List))
           AdminPayment.fromMap(Map<String, dynamic>.from(r as Map)),
@@ -659,6 +671,23 @@ class DemoBackend implements Backend {
 
   @override
   Future<List<AdminPayment>> recentApprovedTickets() async => [];
+
+  @override
+  Future<List<AdminPayment>> allPayments() async => [
+        for (final p in _payments.where((p) => p.status != 'awaiting'))
+          AdminPayment(
+            id: p.id,
+            reference: p.reference,
+            label: p.label,
+            kind: p.kind,
+            amountInr: p.amountInr,
+            utr: p.utr ?? '',
+            payerName: _profile?.fullName ?? 'Demo member',
+            payerPhone: _phone ?? '',
+            submittedAt: p.createdAt,
+            status: p.status,
+          ),
+      ];
 
   @override
   Future<void> sendTicketEmail(String paymentId, {bool resend = false}) async {}

@@ -147,6 +147,9 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// The full payment history for the admin page. Loaded when that page opens.
+  Future<List<AdminPayment>> loadAllPayments() => backend.allPayments();
+
   String _clean(Object e) => e.toString().replaceFirst('Exception: ', '');
 
   void setTab(int i) {
