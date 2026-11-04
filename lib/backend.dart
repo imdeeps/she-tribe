@@ -35,6 +35,7 @@ abstract class Backend {
   Future<PaymentRequest> requestTicketPayment({required String eventId, required String tierId});
   Future<PaymentRequest> requestMembershipPayment(String planCode);
   Future<void> submitPayment({required String paymentId, required String phone});
+  Future<void> updatePaymentPhone({required String paymentId, required String phone});
 
   Future<bool> amIAdmin();
   Future<List<AdminPayment>> pendingPayments();
@@ -226,6 +227,13 @@ class SupabaseBackend implements Backend {
   Future<void> submitPayment({required String paymentId, required String phone}) {
     return _rpc(() async {
       await _c.rpc('submit_payment', params: {'p_payment': paymentId, 'p_phone': phone});
+    });
+  }
+
+  @override
+  Future<void> updatePaymentPhone({required String paymentId, required String phone}) {
+    return _rpc(() async {
+      await _c.rpc('update_payment_phone', params: {'p_payment': paymentId, 'p_phone': phone});
     });
   }
 
@@ -640,6 +648,15 @@ class DemoBackend implements Backend {
       throw Exception('Enter the 10-digit mobile number you paid from.');
     }
     _setPayment(paymentId, (p) => _copy(p, status: 'submitted', phone: clean));
+  }
+
+  @override
+  Future<void> updatePaymentPhone({required String paymentId, required String phone}) async {
+    final clean = cleanIndianMobile(phone);
+    if (clean == null) {
+      throw Exception('Enter the 10-digit mobile number you paid from.');
+    }
+    _setPayment(paymentId, (p) => _copy(p, phone: clean));
   }
 
   // In demo mode you are your own admin, so you can see the full flow.

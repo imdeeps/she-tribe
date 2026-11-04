@@ -50,16 +50,67 @@ class _PayScreenState extends State<PayScreen> {
   }
 
   Future<void> _submit(AppState app, PaymentRequest pay) async {
+    final clean = cleanIndianMobile(_phone.text);
+    if (clean == null) {
+      setState(() => _error = 'Enter the 10-digit mobile number you paid from.');
+      return;
+    }
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Is this number right?'),
+        content: Text(
+            'We\u2019ll look for a payment from ${formatMobile(clean)}. Please use the number you paid from.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Edit')),
+          TextButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: const Text('Yes, that\u2019s right')),
+        ],
+      ),
+    );
+    if (ok != true) return;
     setState(() {
       _busy = true;
       _error = null;
     });
     try {
-      await app.submitPayment(pay.id, _phone.text);
+      await app.submitPayment(pay.id, clean);
     } catch (e) {
       if (mounted) setState(() => _error = errorText(e));
     } finally {
       if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _editPhone(AppState app, PaymentRequest pay) async {
+    final c = TextEditingController(text: pay.payerPhone ?? '');
+    final v = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Edit your mobile number'),
+        content: TextField(
+          controller: c,
+          autofocus: true,
+          keyboardType: TextInputType.phone,
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            LengthLimitingTextInputFormatter(12),
+          ],
+          decoration: fieldDecoration('Your 10-digit mobile number', hint: '98765 43210'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(c.text), child: const Text('Save')),
+        ],
+      ),
+    );
+    if (v == null) return;
+    try {
+      await app.updatePaymentPhone(pay.id, v);
+      if (mounted) snack(context, 'Mobile number updated');
+    } catch (e) {
+      if (mounted) snack(context, errorText(e));
     }
   }
 
@@ -122,7 +173,16 @@ class _PayScreenState extends State<PayScreen> {
           const SizedBox(height: 12),
           Text('Reference ${pay.reference} \u00B7 Paid from ${formatMobile(pay.payerPhone ?? '')}',
               style: Brand.body(14)),
-          const SizedBox(height: 16),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              style: TextButton.styleFrom(padding: EdgeInsets.zero),
+              onPressed: () => _editPhone(app, pay),
+              child: Text('Wrong number? Edit my number',
+                  style: Brand.body(14, color: Brand.accent, weight: FontWeight.w700)),
+            ),
+          ),
+          const SizedBox(height: 12),
           const WhatsappAsk(
             title: 'Get your ticket update on WhatsApp',
             body: 'We\u2019ll message you the moment your payment is confirmed, plus the venue and timing before the event.',

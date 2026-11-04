@@ -231,6 +231,11 @@ class AppState extends ChangeNotifier {
     await refresh();
   }
 
+  Future<void> updatePaymentPhone(String paymentId, String phone) async {
+    await backend.updatePaymentPhone(paymentId: paymentId, phone: phone);
+    await refresh();
+  }
+
   /// Sends the confirmation email again (admin only).
   Future<void> resendTicketEmail(String paymentId) async {
     await backend.sendTicketEmail(paymentId, resend: true);
