@@ -12,7 +12,7 @@ import '../widgets/common.dart';
 import '../widgets/whatsapp_ask.dart';
 
 /// Pay by scanning a UPI QR with Google Pay (or any UPI app), then enter the
-/// transaction ID so the She Tribe team can confirm it.
+/// mobile number so the She Tribe team can confirm it.
 class PayScreen extends StatefulWidget {
   const PayScreen({super.key, required this.paymentId});
 
@@ -23,13 +23,13 @@ class PayScreen extends StatefulWidget {
 }
 
 class _PayScreenState extends State<PayScreen> {
-  final _utr = TextEditingController();
+  final _phone = TextEditingController();
   bool _busy = false;
   String? _error;
 
   @override
   void dispose() {
-    _utr.dispose();
+    _phone.dispose();
     super.dispose();
   }
 
@@ -55,7 +55,7 @@ class _PayScreenState extends State<PayScreen> {
       _error = null;
     });
     try {
-      await app.submitPayment(pay.id, _utr.text);
+      await app.submitPayment(pay.id, _phone.text);
     } catch (e) {
       if (mounted) setState(() => _error = errorText(e));
     } finally {
@@ -120,7 +120,7 @@ class _PayScreenState extends State<PayScreen> {
             'We check each payment against our UPI history. Your ticket or membership turns on as soon as it matches. Pull down on the app to refresh.',
           ),
           const SizedBox(height: 12),
-          Text('Reference ${pay.reference} \u00B7 Transaction ID ${pay.utr ?? ''}',
+          Text('Reference ${pay.reference} \u00B7 Paid from ${formatMobile(pay.payerPhone ?? '')}',
               style: Brand.body(14)),
           const SizedBox(height: 16),
           const WhatsappAsk(
@@ -136,7 +136,7 @@ class _PayScreenState extends State<PayScreen> {
           _statusCard(
             Icons.error_outline,
             'We couldn\u2019t confirm this payment',
-            'We couldn\u2019t match it to our UPI history. If money left your account, please message us with your transaction ID.',
+            'We couldn\u2019t match it to our UPI history. If money left your account, please message us with the mobile number you paid from.',
           ),
           const SizedBox(height: 16),
           FilledButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Back')),
@@ -220,18 +220,19 @@ class _PayScreenState extends State<PayScreen> {
       Text('After you pay', style: Brand.display(22)),
       const SizedBox(height: 6),
       Text(
-        'Open the payment in your UPI app and copy the 12-digit UPI transaction ID (it may be called UPI Ref No. or UTR). Enter it here so we can match your payment.',
+        'Enter the 10-digit mobile number you paid from, so we can match your payment. We\u2019ll also use it to send you your ticket updates.',
         style: Brand.body(15, height: 1.5),
       ),
       const SizedBox(height: 14),
       TextField(
-        controller: _utr,
-        keyboardType: TextInputType.number,
+        controller: _phone,
+        keyboardType: TextInputType.phone,
+        autofillHints: const [AutofillHints.telephoneNumberNational],
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly,
           LengthLimitingTextInputFormatter(12),
         ],
-        decoration: fieldDecoration('12-digit UPI transaction ID', hint: '4012 3456 7890'),
+        decoration: fieldDecoration('Your 10-digit mobile number', hint: '98765 43210'),
         onSubmitted: (_) => _busy ? null : _submit(app, pay),
       ),
       if (_error != null) ...[

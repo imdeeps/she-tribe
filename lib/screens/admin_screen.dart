@@ -71,7 +71,7 @@ class _AdminScreenState extends State<AdminScreen> {
     return PageScroll(
       title: 'Payments to check',
       subtitle:
-          'Open Google Pay, find the payment with the same amount and transaction ID, then approve it here.',
+          'Open Google Pay, find the payment with the same amount and mobile number, then approve it here.',
       onRefresh: app.refresh,
       children: [
         OutlinedButton.icon(
@@ -83,7 +83,7 @@ class _AdminScreenState extends State<AdminScreen> {
         const SizedBox(height: 14),
         if (app.pending.isEmpty)
           SoftCard(
-            child: Text('Nothing waiting. New payments appear here once members submit their transaction ID.',
+            child: Text('Nothing waiting. New payments appear here once members submit their mobile number.',
                 style: Brand.body(16, height: 1.5)),
           ),
         for (final p in app.pending)
@@ -107,7 +107,8 @@ class _AdminScreenState extends State<AdminScreen> {
                   const SizedBox(height: 10),
                   _line('Name', p.payerName.isEmpty ? 'Not set' : p.payerName),
                   _line('Contact', p.payerPhone),
-                  _line('Transaction ID', p.utr),
+                  _line('Paid from', p.paidFrom.isEmpty ? '-' : formatMobile(p.paidFrom)),
+                  if (p.utr.isNotEmpty) _line('Transaction ID', p.utr),
                   _line('Note on payment', p.reference),
                   if (p.submittedAt != null) _line('Submitted', formatDate(p.submittedAt)),
                   const SizedBox(height: 14),

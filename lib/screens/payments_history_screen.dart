@@ -115,7 +115,8 @@ class _PaymentsHistoryScreenState extends State<PaymentsHistoryScreen> {
                       if (p.decidedAt != null)
                         _line(p.status == 'rejected' ? 'Rejected on' : 'Approved on',
                             formatDate(p.decidedAt)),
-                      _line('Transaction ID', p.utr.isEmpty ? '-' : p.utr),
+                      _line('Paid from', p.paidFrom.isEmpty ? '-' : formatMobile(p.paidFrom)),
+                      if (p.utr.isNotEmpty) _line('Transaction ID', p.utr),
                       _line('Reference', p.reference),
                     ],
                   ),

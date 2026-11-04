@@ -226,8 +226,8 @@ class AppState extends ChangeNotifier {
     return p;
   }
 
-  Future<void> submitPayment(String paymentId, String utr) async {
-    await backend.submitPayment(paymentId: paymentId, utr: utr);
+  Future<void> submitPayment(String paymentId, String phone) async {
+    await backend.submitPayment(paymentId: paymentId, phone: phone);
     await refresh();
   }
 

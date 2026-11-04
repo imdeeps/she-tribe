@@ -34,7 +34,7 @@ abstract class Backend {
   Future<List<PaymentRequest>> myPayments();
   Future<PaymentRequest> requestTicketPayment({required String eventId, required String tierId});
   Future<PaymentRequest> requestMembershipPayment(String planCode);
-  Future<void> submitPayment({required String paymentId, required String utr});
+  Future<void> submitPayment({required String paymentId, required String phone});
 
   Future<bool> amIAdmin();
   Future<List<AdminPayment>> pendingPayments();
@@ -223,9 +223,9 @@ class SupabaseBackend implements Backend {
   }
 
   @override
-  Future<void> submitPayment({required String paymentId, required String utr}) {
+  Future<void> submitPayment({required String paymentId, required String phone}) {
     return _rpc(() async {
-      await _c.rpc('submit_payment', params: {'p_payment': paymentId, 'p_utr': utr});
+      await _c.rpc('submit_payment', params: {'p_payment': paymentId, 'p_phone': phone});
     });
   }
 
@@ -582,7 +582,7 @@ class DemoBackend implements Backend {
     if (i >= 0) _payments[i] = change(_payments[i]);
   }
 
-  PaymentRequest _copy(PaymentRequest p, {String? status, String? utr}) =>
+  PaymentRequest _copy(PaymentRequest p, {String? status, String? phone}) =>
       PaymentRequest(
         id: p.id,
         kind: p.kind,
@@ -592,7 +592,8 @@ class DemoBackend implements Backend {
         amountInr: p.amountInr,
         reference: p.reference,
         status: status ?? p.status,
-        utr: utr ?? p.utr,
+        utr: p.utr,
+        payerPhone: phone ?? p.payerPhone,
         createdAt: p.createdAt,
       );
 
@@ -633,12 +634,12 @@ class DemoBackend implements Backend {
   }
 
   @override
-  Future<void> submitPayment({required String paymentId, required String utr}) async {
-    final clean = utr.replaceAll(RegExp(r'\s'), '');
-    if (!RegExp(r'^[0-9]{12}$').hasMatch(clean)) {
-      throw Exception('Enter the 12-digit UPI transaction ID shown in your payment app.');
+  Future<void> submitPayment({required String paymentId, required String phone}) async {
+    final clean = cleanIndianMobile(phone);
+    if (clean == null) {
+      throw Exception('Enter the 10-digit mobile number you paid from.');
     }
-    _setPayment(paymentId, (p) => _copy(p, status: 'submitted', utr: clean));
+    _setPayment(paymentId, (p) => _copy(p, status: 'submitted', phone: clean));
   }
 
   // In demo mode you are your own admin, so you can see the full flow.
@@ -655,6 +656,7 @@ class DemoBackend implements Backend {
             kind: p.kind,
             amountInr: p.amountInr,
             utr: p.utr ?? '',
+            paidFrom: p.payerPhone ?? '',
             payerName: _profile?.fullName ?? 'Demo member',
             payerPhone: _phone ?? '',
             submittedAt: p.createdAt,
@@ -674,6 +676,7 @@ class DemoBackend implements Backend {
             kind: p.kind,
             amountInr: p.amountInr,
             utr: p.utr ?? '',
+            paidFrom: p.payerPhone ?? '',
             payerName: _profile?.fullName ?? 'Demo member',
             payerPhone: _phone ?? '',
             submittedAt: p.createdAt,

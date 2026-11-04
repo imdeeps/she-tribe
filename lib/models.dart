@@ -361,6 +361,7 @@ class PaymentRequest {
   final String reference;
   final String status; // awaiting | submitted | approved | rejected | cancelled
   final String? utr;
+  final String? payerPhone;
   final DateTime createdAt;
 
   const PaymentRequest({
@@ -373,6 +374,7 @@ class PaymentRequest {
     required this.reference,
     required this.status,
     this.utr,
+    this.payerPhone,
     required this.createdAt,
   });
 
@@ -388,6 +390,7 @@ class PaymentRequest {
         reference: (m['reference'] ?? '').toString(),
         status: (m['status'] ?? 'awaiting').toString(),
         utr: m['utr']?.toString(),
+        payerPhone: m['payer_phone']?.toString(),
         createdAt:
             DateTime.tryParse((m['created_at'] ?? '').toString())?.toLocal() ??
                 DateTime.now(),
@@ -408,6 +411,7 @@ class AdminPayment {
   final bool emailSent;
   final String status;
   final DateTime? decidedAt;
+  final String paidFrom;
 
   const AdminPayment({
     required this.id,
@@ -422,6 +426,7 @@ class AdminPayment {
     this.emailSent = false,
     this.status = 'submitted',
     this.decidedAt,
+    this.paidFrom = '',
   });
 
   factory AdminPayment.fromMap(Map<String, dynamic> m) => AdminPayment(
@@ -437,6 +442,7 @@ class AdminPayment {
             ? null
             : DateTime.tryParse(m['submitted_at'].toString())?.toLocal(),
         emailSent: m['email_sent'] == true,
+        paidFrom: (m['paid_from'] ?? '').toString(),
         status: (m['status'] ?? 'submitted').toString(),
         decidedAt: m['decided_at'] == null
             ? null
@@ -461,3 +467,7 @@ String? cleanIndianMobile(String input) {
   if (d.length == 10 && RegExp(r'^[6-9]').hasMatch(d)) return d;
   return null;
 }
+
+/// 9876543210 -> +91 98765 43210
+String formatMobile(String ten) =>
+    ten.length == 10 ? '+91 ${ten.substring(0, 5)} ${ten.substring(5)}' : ten;
