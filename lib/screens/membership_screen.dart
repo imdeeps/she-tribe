@@ -50,7 +50,7 @@ class _MembershipScreenState extends State<MembershipScreen> {
 
     return PageScroll(
       title: 'Membership',
-      subtitle: 'Join free, or go deeper with a membership.',
+      subtitle: 'Two meet-ups every month. Pick the one that suits you.',
       onRefresh: app.refresh,
       children: [
         if (app.isMember)
@@ -80,39 +80,15 @@ class _MembershipScreenState extends State<MembershipScreen> {
         ResponsiveWrap(
           minItemWidth: 290,
           children: [
-            _freeCard(app),
             for (final p in app.plans) _planCard(app, p),
           ],
         ),
         const SizedBox(height: 20),
         Text(
-          'Memberships last for the period shown and don\u2019t renew automatically. Renew any time from here and the time is added on top. To change or cancel, contact the She Tribe team.',
+          'Each booking covers one month and doesn\u2019t renew automatically. To change or cancel, contact the She Tribe team.',
           style: Brand.body(14, height: 1.5),
         ),
       ],
-    );
-  }
-
-  Widget _freeCard(AppState app) {
-    return SoftCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('She Tribe Free', style: Brand.display(24, weight: FontWeight.w700)),
-          const SizedBox(height: 6),
-          Text('Free', style: Brand.display(30, weight: FontWeight.w700, color: Brand.accent)),
-          const SizedBox(height: 6),
-          const PerkRow('The She Tribe community'),
-          const PerkRow('Occasional networking'),
-          const PerkRow('Event announcements'),
-          const PerkRow('Ask & Offer wall'),
-          const SizedBox(height: 18),
-          const SizedBox(
-            width: double.infinity,
-            child: FilledButton(onPressed: null, child: Text('You\u2019re in')),
-          ),
-        ],
-      ),
     );
   }
 
@@ -175,10 +151,6 @@ class _MembershipScreenState extends State<MembershipScreen> {
             children: [
               Text(formatInr(plan.priceInr),
                   style: Brand.display(30, weight: FontWeight.w700, color: Brand.accent)),
-              Padding(
-                padding: const EdgeInsets.only(left: 6, bottom: 5),
-                child: Text('/ ${plan.interval}', style: Brand.body(14, weight: FontWeight.w600)),
-              ),
             ],
           ),
           const SizedBox(height: 6),

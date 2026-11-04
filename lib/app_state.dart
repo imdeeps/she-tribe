@@ -34,6 +34,8 @@ class AppState extends ChangeNotifier {
   String? error;
 
   bool get isMember => membership?.isActive ?? false;
+  /// The member directory is only for the Annual plan, which is not open yet.
+  bool get isAnnualMember => isMember && membership?.planCode == 'annual';
 
   Registration? registrationFor(String eventId) {
     for (final r in registrations) {

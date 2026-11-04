@@ -167,7 +167,7 @@ class _Directory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppState>();
-    if (!app.isMember) {
+    if (!app.isAnnualMember) {
       return SoftCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

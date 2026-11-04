@@ -56,8 +56,8 @@ class HomeScreen extends StatelessWidget {
             if (!app.isMember)
               _ActionTile(
                 icon: Icons.workspace_premium_outlined,
-                title: 'Become a member',
-                text: 'Monthly networking, workshops and the member directory.',
+                title: 'Monthly meet-ups',
+                text: 'A caf\u00E9 meet-up and an activity day every month.',
                 onTap: () => app.setTab(3),
               ),
           ],

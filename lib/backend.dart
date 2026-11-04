@@ -502,19 +502,18 @@ class DemoBackend implements Backend {
   @override
   Future<List<Plan>> plans() async => const [
         Plan(
-          code: 'member',
-          name: 'She Tribe Member',
-          tagline: 'Monthly networking and member-only perks',
-          priceInr: 1499,
-          interval: 'year',
-          perks: [
-            'Monthly networking',
-            'Member directory',
-            'Member-only workshops',
-            'Collaboration opportunities',
-            'Discounts',
-            'Business spotlights',
-          ],
+          code: 'cafe',
+          name: 'Caf\u00E9 meet-up',
+          tagline: '1st monthly event \u00B7 Wednesdays',
+          priceInr: 499,
+          interval: 'month',
+        ),
+        Plan(
+          code: 'activity',
+          name: 'Meet & activity',
+          tagline: '2nd monthly event \u00B7 Saturdays',
+          priceInr: 699,
+          interval: 'month',
         ),
         Plan(
           code: 'circle',
