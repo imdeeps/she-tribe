@@ -186,6 +186,14 @@ class _PayScreenState extends State<PayScreen> {
               textAlign: TextAlign.center,
               style: Brand.body(14, height: 1.45),
             ),
+            if (settings.payeeName.trim().isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Text(
+                'You\u2019ll see the name ${settings.payeeName.trim()} in your UPI app. That\u2019s the right place to pay.',
+                textAlign: TextAlign.center,
+                style: Brand.body(14, weight: FontWeight.w700, color: Brand.ink, height: 1.4),
+              ),
+            ],
           ],
         ),
       ),
@@ -235,6 +243,20 @@ class _PayScreenState extends State<PayScreen> {
         decoration: fieldDecoration('Your 10-digit mobile number', hint: '98765 43210'),
         onSubmitted: (_) => _busy ? null : _submit(app, pay),
       ),
+      const SizedBox(height: 8),
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.lock_outline, size: 16, color: Brand.accent),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              'Used only to match your payment and send ticket updates. We never share it or send spam.',
+              style: Brand.body(13, height: 1.4),
+            ),
+          ),
+        ],
+      ),
       if (_error != null) ...[
         const SizedBox(height: 8),
         Text(_error!,
@@ -249,7 +271,7 @@ class _PayScreenState extends State<PayScreen> {
         Padding(
           padding: const EdgeInsets.only(top: 10),
           child: Text(
-            'Demo mode: no real payment happens. Type any 12 digits (for example 401234567890), then approve it in the Admin tab.',
+            'Demo mode: no real payment happens. Type any Indian mobile number (for example 9876543210), then approve it in the Admin tab.',
             style: Brand.body(13, height: 1.4),
           ),
         ),
