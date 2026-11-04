@@ -174,16 +174,16 @@ class _Directory extends StatelessWidget {
           children: [
             const Icon(Icons.lock_outline, color: Brand.accent, size: 32),
             const SizedBox(height: 12),
-            Text('The member directory is for members', style: Brand.display(22)),
+            Text('Member directory', style: Brand.display(22)),
             const SizedBox(height: 8),
             Text(
-              'Members can find women to collaborate with, learn from and refer. Only women who choose to be listed appear here.',
+              'The member directory is for Annual subscription members only. Members can find women to collaborate with, learn from and refer. Only women who choose to be listed appear here.',
               style: Brand.body(16, height: 1.5),
             ),
             const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () => app.setTab(3),
-              child: const Text('See membership'),
+            const FilledButton(
+              onPressed: null,
+              child: Text('Coming soon'),
             ),
           ],
         ),

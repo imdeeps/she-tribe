@@ -120,6 +120,27 @@ class _MembershipScreenState extends State<MembershipScreen> {
     final isCurrent = app.isMember && app.membership?.planCode == plan.code;
     final open = app.openMembershipPayment(plan.code);
     final short = plan.name.replaceFirst('She Tribe ', '');
+    if (plan.code == 'circle') {
+      // Not open yet: keep the name and tagline, hide price and features.
+      return SoftCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(plan.name, style: Brand.display(24, weight: FontWeight.w700)),
+            const SizedBox(height: 4),
+            if (plan.tagline.isNotEmpty) Text(plan.tagline, style: Brand.body(14, height: 1.4)),
+            const SizedBox(height: 14),
+            Text('Coming soon',
+                style: Brand.display(30, weight: FontWeight.w700, color: Brand.accent)),
+            const SizedBox(height: 18),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(onPressed: null, child: Text('Join $short')),
+            ),
+          ],
+        ),
+      );
+    }
     Widget action;
     if (open != null) {
       action = FilledButton(

@@ -467,7 +467,7 @@ class DemoBackend implements Backend {
             'A warm, relaxed meet-up in Chennai for women who are building, growing or dreaming of something of their own. Come for real conversations, leave with new friends and fresh ideas. A few surprises are waiting inside.',
           ],
           venue: 'Venue to be announced \u00B7 Chennai',
-          capacity: 50,
+          capacity: 15,
           tiers: [
             TicketTier(
               id: 't1',
