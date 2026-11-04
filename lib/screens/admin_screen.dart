@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../app_state.dart';
+import '../config.dart';
 import '../models.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
@@ -62,6 +63,20 @@ class _AdminScreenState extends State<AdminScreen> {
       if (mounted) snack(context, errorText(e));
     } finally {
       if (mounted) setState(() => _busyId = null);
+    }
+  }
+
+  Future<void> _whatsappTicket(AdminPayment p) async {
+    var digits = p.whatsapp.replaceAll(RegExp(r'\D'), '');
+    if (digits.length == 10) digits = '91$digits';
+    final first = p.payerName.trim().isEmpty ? 'there' : p.payerName.trim().split(' ').first;
+    final text = 'Hi $first, your She Tribe ticket is confirmed! '
+        'Open your ticket here: ${Config.appUrl}/?t=${p.ticketToken} '
+        'Show the QR code at the entrance. See you there!';
+    try {
+      await openUrl('https://wa.me/$digits?text=${Uri.encodeComponent(text)}');
+    } catch (e) {
+      if (mounted) snack(context, errorText(e));
     }
   }
 
@@ -158,6 +173,16 @@ class _AdminScreenState extends State<AdminScreen> {
                           ? 'Sending...'
                           : (p.emailSent ? 'Resend email' : 'Send confirmation email')),
                     ),
+                    const SizedBox(height: 8),
+                    if (p.whatsapp.isNotEmpty && p.ticketToken.isNotEmpty)
+                      FilledButton.icon(
+                        onPressed: () => _whatsappTicket(p),
+                        icon: const Icon(Icons.send),
+                        label: const Text('Send ticket on WhatsApp'),
+                      )
+                    else
+                      Text('No WhatsApp number (the member did not opt in).',
+                          style: Brand.body(13)),
                   ],
                 ),
               ),

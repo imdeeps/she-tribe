@@ -9,7 +9,6 @@ import '../config.dart';
 import '../models.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
-import '../widgets/whatsapp_ask.dart';
 
 /// Pay by scanning a UPI QR with Google Pay (or any UPI app), then enter the
 /// mobile number so the She Tribe team can confirm it.
@@ -25,6 +24,7 @@ class PayScreen extends StatefulWidget {
 class _PayScreenState extends State<PayScreen> {
   final _phone = TextEditingController();
   bool _busy = false;
+  bool _wa = true;
   String? _error;
 
   @override
@@ -76,6 +76,13 @@ class _PayScreenState extends State<PayScreen> {
     });
     try {
       await app.submitPayment(pay.id, clean);
+      if (_wa) {
+        try {
+          await app.saveWhatsapp(clean);
+        } catch (_) {
+          // The payment is already submitted; a failed WhatsApp save should not block it.
+        }
+      }
     } catch (e) {
       if (mounted) setState(() => _error = errorText(e));
     } finally {
@@ -156,11 +163,6 @@ class _PayScreenState extends State<PayScreen> {
           _statusCard(Icons.check_circle, 'Payment confirmed',
               'Thank you! You\u2019re all set.'),
           const SizedBox(height: 16),
-          const WhatsappAsk(
-            title: 'Want your event details on WhatsApp?',
-            body: 'We\u2019ll send your venue, timing and reminders there, so you don\u2019t have to hunt through emails.',
-          ),
-          const SizedBox(height: 16),
           FilledButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Done')),
         ];
       case 'submitted':
@@ -181,11 +183,6 @@ class _PayScreenState extends State<PayScreen> {
               child: Text('Wrong number? Edit my number',
                   style: Brand.body(14, color: Brand.accent, weight: FontWeight.w700)),
             ),
-          ),
-          const SizedBox(height: 12),
-          const WhatsappAsk(
-            title: 'Get your ticket update on WhatsApp',
-            body: 'We\u2019ll message you the moment your payment is confirmed, plus the venue and timing before the event.',
           ),
           const SizedBox(height: 16),
           FilledButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Back to the app')),
@@ -303,7 +300,16 @@ class _PayScreenState extends State<PayScreen> {
         decoration: fieldDecoration('Your 10-digit mobile number', hint: '98765 43210'),
         onSubmitted: (_) => _busy ? null : _submit(app, pay),
       ),
-      const SizedBox(height: 8),
+      CheckboxListTile(
+        value: _wa,
+        onChanged: (v) => setState(() => _wa = v ?? true),
+        contentPadding: EdgeInsets.zero,
+        controlAffinity: ListTileControlAffinity.leading,
+        dense: true,
+        title: Text('Also send my ticket and event updates to this number on WhatsApp',
+            style: Brand.body(14, weight: FontWeight.w600, color: Brand.ink, height: 1.35)),
+      ),
+      const SizedBox(height: 4),
       Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

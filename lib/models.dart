@@ -412,6 +412,8 @@ class AdminPayment {
   final String status;
   final DateTime? decidedAt;
   final String paidFrom;
+  final String whatsapp;
+  final String ticketToken;
 
   const AdminPayment({
     required this.id,
@@ -427,6 +429,8 @@ class AdminPayment {
     this.status = 'submitted',
     this.decidedAt,
     this.paidFrom = '',
+    this.whatsapp = '',
+    this.ticketToken = '',
   });
 
   factory AdminPayment.fromMap(Map<String, dynamic> m) => AdminPayment(
@@ -443,6 +447,8 @@ class AdminPayment {
             : DateTime.tryParse(m['submitted_at'].toString())?.toLocal(),
         emailSent: m['email_sent'] == true,
         paidFrom: (m['paid_from'] ?? '').toString(),
+        whatsapp: (m['whatsapp'] ?? '').toString(),
+        ticketToken: (m['ticket_token'] ?? '').toString(),
         status: (m['status'] ?? 'submitted').toString(),
         decidedAt: m['decided_at'] == null
             ? null
