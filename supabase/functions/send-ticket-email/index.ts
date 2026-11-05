@@ -31,16 +31,23 @@ function ticketCode(id: string) {
 
 function when(iso: string | null) {
   if (!iso) return "Date to be announced";
-  return new Date(iso).toLocaleString("en-IN", {
+  const start = new Date(iso);
+  const end = new Date(start.getTime() + 2 * 60 * 60 * 1000); // events run 2 hours
+  const day = start.toLocaleDateString("en-IN", {
     timeZone: "Asia/Kolkata",
     weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
   });
+  const clock = (d: Date) =>
+    d.toLocaleTimeString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).toUpperCase();
+  return `${day}, ${clock(start)} - ${clock(end)}`;
 }
 
 Deno.serve(async (req) => {
