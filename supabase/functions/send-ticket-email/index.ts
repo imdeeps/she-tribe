@@ -18,7 +18,7 @@ const admin = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY
 });
 
 const FROM = Deno.env.get("TICKET_EMAIL_FROM") ?? "She Tribe <tickets@shetribe.in>";
-const REPLY_TO = Deno.env.get("TICKET_REPLY_TO") ?? "";
+const REPLY_TO = Deno.env.get("TICKET_REPLY_TO") ?? "shetribe2026@gmail.com";
 const CONTACT = Deno.env.get("TICKET_CONTACT") ?? "+91 79041 87294";
 const APP_URL = Deno.env.get("APP_URL") ?? "https://app.shetribe.in";
 
