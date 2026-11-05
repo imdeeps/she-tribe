@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../app_state.dart';
 import '../models.dart';
 import '../theme.dart';
+import '../widgets/directions_link.dart';
 import '../widgets/common.dart';
 import 'pay_screen.dart';
 import 'ticket_screen.dart';
@@ -62,6 +63,7 @@ class _EventCard extends StatelessWidget {
             Text(formatDate(event.startsAt),
                 style: Brand.body(15, weight: FontWeight.w600, color: Brand.ink)),
             if (event.venue.isNotEmpty) Text(event.venue, style: Brand.body(15)),
+            DirectionsLink(venue: event.venue),
             const SizedBox(height: 10),
             Text(
               lowest == null ? 'Tickets coming soon' : 'Tickets from ${formatInr(lowest)}',
@@ -161,6 +163,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           if (event.capacity != null) Tag('${event.capacity} seats'),
         ],
       ),
+      DirectionsLink(venue: event.venue),
       if (reg?.isPaid ?? false) ...[
         const SizedBox(height: 20),
         SoftCard(

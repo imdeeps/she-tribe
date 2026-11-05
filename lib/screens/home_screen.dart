@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../app_state.dart';
 import '../models.dart';
 import '../theme.dart';
+import '../widgets/directions_link.dart';
 import '../widgets/common.dart';
 import 'events_screen.dart';
 import 'ticket_screen.dart';
@@ -111,6 +112,7 @@ class _NextEventCard extends StatelessWidget {
               padding: const EdgeInsets.only(top: 4),
               child: Text(event.venue, style: Brand.body(16)),
             ),
+          DirectionsLink(venue: event.venue),
           if (event.capacity != null)
             Padding(
               padding: const EdgeInsets.only(top: 4),

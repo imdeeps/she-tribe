@@ -3,6 +3,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 import '../models.dart';
 import '../theme.dart';
+import 'directions_link.dart';
 
 /// The ticket itself: event details, a QR code and the ticket number.
 class TicketCard extends StatelessWidget {
@@ -70,6 +71,7 @@ class TicketCard extends StatelessWidget {
               children: [
                 field('Date and time', formatDate(startsAt)),
                 if (venue.isNotEmpty) field('Venue', venue),
+                if (venue.isNotEmpty) DirectionsLink(venue: venue),
                 if (attendeeName.isNotEmpty) field('Name', attendeeName),
                 if (tierName.isNotEmpty) field('Ticket', tierName),
               ],
