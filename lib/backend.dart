@@ -470,7 +470,7 @@ class DemoBackend implements Backend {
           title: 'SHE TRIBE: The First Circle',
           subtitle: 'For women who dream. Women who build. Women who grow.',
           description:
-              'An intimate, interactive meet-up for women who are building, growing or dreaming of building something of their own. You do not need a business to belong.',
+              'An interactive meet-up for women who are building, growing or dreaming of building something of their own. You do not need a business to belong.',
           highlights: [
             'A warm, relaxed meet-up in Chennai for women who are building, growing or dreaming of something of their own. Come for real conversations, leave with new friends and fresh ideas. A few surprises are waiting inside.',
           ],

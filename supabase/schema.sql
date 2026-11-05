@@ -443,7 +443,7 @@ with ev as (
   values (
     'SHE TRIBE: The First Circle',
     'For women who dream. Women who build. Women who grow.',
-    'An intimate, interactive meet-up for women who are building, growing or dreaming of building something of their own. You do not need a business to belong.',
+    'An interactive meet-up for women who are building, growing or dreaming of building something of their own. You do not need a business to belong.',
     array['Who''s in the room?','60-second SHE intro','Idea to Business conversation','The SHE TRIBE Hot Seat','Collaboration Circle','Ask & Offer wall','Networking bingo','Commitment card'],
     'Venue to be announced, Chennai',
     50,
