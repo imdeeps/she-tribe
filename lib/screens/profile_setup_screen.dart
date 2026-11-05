@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../app_state.dart';
@@ -54,6 +55,10 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   Future<void> _save() async {
     if (_name.text.trim().isEmpty) {
       setState(() => _error = 'Please tell us your name.');
+      return;
+    }
+    if (!RegExp(r'^[\p{L}\p{M} ]+$', unicode: true).hasMatch(_name.text.trim())) {
+      setState(() => _error = 'Your name can only have letters and spaces.');
       return;
     }
     final app = context.read<AppState>();
@@ -123,6 +128,12 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   controller: _name,
                   textCapitalization: TextCapitalization.words,
                   autofillHints: const [AutofillHints.name],
+                  // Letters and spaces only (any language), no digits or symbols.
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                        RegExp(r'[\p{L}\p{M} ]', unicode: true)),
+                    LengthLimitingTextInputFormatter(60),
+                  ],
                   decoration: fieldDecoration('Full name'),
                 ),
                 _label('Where are you on your journey?'),
