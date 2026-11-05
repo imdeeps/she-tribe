@@ -317,12 +317,17 @@ const _months = [
 ];
 const _days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-String formatDate(DateTime? d) {
-  if (d == null) return 'Date to be announced';
+String _clock(DateTime d) {
   final h12 = d.hour % 12 == 0 ? 12 : d.hour % 12;
   final mm = d.minute.toString().padLeft(2, '0');
-  final ap = d.hour >= 12 ? 'PM' : 'AM';
-  return '${_days[d.weekday - 1]}, ${d.day} ${_months[d.month - 1]} ${d.year} \u00B7 $h12:$mm $ap';
+  return '$h12:$mm ${d.hour >= 12 ? 'PM' : 'AM'}';
+}
+
+/// Events run for two hours, so show the full window (e.g. 4:00 PM - 6:00 PM).
+String formatDate(DateTime? d) {
+  if (d == null) return 'Date to be announced';
+  final end = d.add(const Duration(hours: 2));
+  return '${_days[d.weekday - 1]}, ${d.day} ${_months[d.month - 1]} ${d.year} \u00B7 ${_clock(d)} - ${_clock(end)}';
 }
 
 String formatShortDate(DateTime d) =>
