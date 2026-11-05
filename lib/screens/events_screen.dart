@@ -216,10 +216,70 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         ResponsiveWrap(
           minItemWidth: 250,
           children: [
-            for (final t in event.tiers) _tierCard(app, event, t, reg),
+            // Early Bird is replaced by Tribe Brew (unless she already holds an Early Bird seat).
+            _brewCard(app),
+            for (final t in event.tiers)
+              if (t.name != 'Early Bird' || (reg != null && reg.tierId == t.id))
+                _tierCard(app, event, t, reg),
           ],
         ),
     ];
+  }
+
+  Future<void> _joinBrew(AppState app, Plan plan) async {
+    setState(() => _busy = true);
+    try {
+      final pay = await app.requestMembershipPayment(plan.code);
+      if (!mounted) return;
+      _openPay(pay.id);
+    } catch (e) {
+      if (mounted) snack(context, errorText(e));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Widget _brewCard(AppState app) {
+    Plan? plan;
+    for (final p in app.plans) {
+      if (p.code == 'cafe') plan = p;
+    }
+    if (plan == null) return const SizedBox.shrink();
+    final isCurrent = app.isMember && app.membership?.planCode == plan.code;
+    final open = app.openMembershipPayment(plan.code);
+    final Widget action;
+    if (open != null) {
+      action = FilledButton(
+        onPressed: () => _openPay(open.id),
+        child: Text(open.status == 'submitted' ? 'Awaiting confirmation' : 'Complete payment'),
+      );
+    } else {
+      final pl = plan;
+      action = FilledButton(
+        onPressed: _busy ? null : () => _joinBrew(app, pl),
+        child: Text(_busy ? 'Please wait...' : (isCurrent ? 'Renew Tribe Brew' : 'Join Tribe Brew')),
+      );
+    }
+    return SoftCard(
+      borderColor: isCurrent ? Brand.accent : Brand.cardLine,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(plan.name, style: Brand.display(22, weight: FontWeight.w700)),
+          if (plan.tagline.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(plan.tagline, style: Brand.body(14, height: 1.4)),
+          ],
+          const SizedBox(height: 6),
+          Text(formatInr(plan.priceInr),
+              style: Brand.display(30, weight: FontWeight.w700, color: Brand.accent)),
+          const SizedBox(height: 6),
+          for (final p in plan.perks) PerkRow(p),
+          const SizedBox(height: 18),
+          SizedBox(width: double.infinity, child: action),
+        ],
+      ),
+    );
   }
 
   Widget _tierCard(AppState app, TribeEvent event, TicketTier t, Registration? reg) {
