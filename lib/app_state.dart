@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import 'backend.dart';
 import 'models.dart';
+import 'pixel/pixel.dart';
 
 enum AppStage { loading, signedOut, needsProfile, ready }
 
@@ -86,6 +87,7 @@ class AppState extends ChangeNotifier {
       if (backend.userId == null) {
         stage = AppStage.signedOut;
       } else {
+        Pixel.start();
         profile = await backend.myProfile();
         if (profile == null || !profile!.isComplete) {
           stage = AppStage.needsProfile;
@@ -129,6 +131,15 @@ class AppState extends ChangeNotifier {
     directory = r[5] as List<Profile>;
     commitment = r[6] as Commitment;
     payments = r[7] as List<PaymentRequest>;
+    // Tell Meta about a member's own approved payments, once each (from the
+    // member's browser, so it is attributed to the right person).
+    for (final p in payments) {
+      if (p.status == 'approved' && p.createdAt.isAfter(DateTime.utc(2026, 11, 6))) {
+        Pixel.track('Purchase',
+            params: {'value': p.amountInr, 'currency': 'INR', 'content_name': p.label},
+            onceKey: 'purchase_${p.id}');
+      }
+    }
     paymentSettings = r[8] as PaymentSettings;
     isAdmin = r[9] as bool;
     phone = r[10] as String?;
@@ -178,7 +189,9 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> saveProfile(Profile p) async {
+    final firstTime = !(profile?.isComplete ?? false);
     await backend.saveProfile(p);
+    if (firstTime) Pixel.track('CompleteRegistration', onceKey: 'registered');
     profile = p;
     await _loadData();
     stage = AppStage.ready;
@@ -214,14 +227,19 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void _trackCheckout(PaymentRequest p) => Pixel.track('InitiateCheckout',
+      params: {'value': p.amountInr, 'currency': 'INR', 'content_name': p.label});
+
   Future<PaymentRequest> requestTicketPayment(String eventId, String tierId) async {
     final p = await backend.requestTicketPayment(eventId: eventId, tierId: tierId);
+    _trackCheckout(p);
     await refresh();
     return p;
   }
 
   Future<PaymentRequest> requestMembershipPayment(String planCode) async {
     final p = await backend.requestMembershipPayment(planCode);
+    _trackCheckout(p);
     await refresh();
     return p;
   }
