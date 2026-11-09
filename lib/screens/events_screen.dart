@@ -217,9 +217,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           minItemWidth: 250,
           children: [
             // Early Bird is retired and replaced by Tribe Brew.
-            _brewCard(app),
+            _brewCard(app, event, reg),
             for (final t in event.tiers)
-              if (t.name != 'Early Bird') _tierCard(app, event, t, reg),
+              if (t.name != 'Early Bird' && t.name != 'Tribe Brew') _tierCard(app, event, t, reg),
           ],
         ),
     ];
@@ -238,7 +238,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     }
   }
 
-  Widget _brewCard(AppState app) {
+  Widget _brewCard(AppState app, TribeEvent event, Registration? reg) {
     Plan? plan;
     for (final p in app.plans) {
       if (p.code == 'cafe') plan = p;
@@ -246,12 +246,16 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     if (plan == null) return const SizedBox.shrink();
     final isCurrent = app.isMember && app.membership?.planCode == plan.code;
     final open = app.openMembershipPayment(plan.code);
+    final hasSeat = reg != null && reg.status == 'paid';
+    final soldOut = app.seatsLeft(event) == 0 && !hasSeat;
     final Widget action;
     if (open != null) {
       action = FilledButton(
         onPressed: () => _openPay(open.id),
         child: Text(open.status == 'submitted' ? 'Awaiting confirmation' : 'Complete payment'),
       );
+    } else if (soldOut) {
+      action = const FilledButton(onPressed: null, child: Text('Sold out'));
     } else {
       final pl = plan;
       action = FilledButton(
@@ -274,8 +278,26 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               style: Brand.display(30, weight: FontWeight.w700, color: Brand.accent)),
           const SizedBox(height: 6),
           for (final p in plan.perks) PerkRow(p),
+          if (app.seatsLabel(event) != null) ...[
+            const SizedBox(height: 4),
+            Text(app.seatsLabel(event)!,
+                style: Brand.body(15, weight: FontWeight.w700, color: Brand.accent)),
+          ],
           const SizedBox(height: 18),
-          SizedBox(width: double.infinity, child: action),
+          if (hasSeat) ...[
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => TicketScreen(eventId: event.id)),
+                ),
+                child: const Text('View your event ticket'),
+              ),
+            ),
+            const SizedBox(height: 10),
+            SizedBox(width: double.infinity, child: action),
+          ] else
+            SizedBox(width: double.infinity, child: action),
         ],
       ),
     );
