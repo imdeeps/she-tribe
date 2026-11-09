@@ -116,7 +116,9 @@ class _NextEventCard extends StatelessWidget {
           if (event.capacity != null)
             Padding(
               padding: const EdgeInsets.only(top: 4),
-              child: Text('Limited to ${event.capacity} women', style: Brand.body(16)),
+              child: Text(
+                  context.watch<AppState>().seatsLabel(event) ?? 'Limited to ${event.capacity} women',
+                  style: Brand.body(16, weight: FontWeight.w600)),
             ),
           const SizedBox(height: 18),
           FilledButton(

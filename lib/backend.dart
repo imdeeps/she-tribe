@@ -44,6 +44,9 @@ abstract class Backend {
   Future<List<AdminPayment>> recentApprovedTickets();
   Future<List<AdminPayment>> allPayments();
 
+  /// Seats taken per event id (paid, or paid and waiting for approval).
+  Future<Map<String, int>> seatsTaken();
+
   Future<List<Profile>> directory();
   Future<List<Post>> posts();
   Future<void> addPost({required String authorName, required String kind, required String text});
@@ -263,6 +266,17 @@ class SupabaseBackend implements Backend {
         for (final r in (rows as List))
           AdminPayment.fromMap(Map<String, dynamic>.from(r as Map)),
       ];
+    });
+  }
+
+  @override
+  Future<Map<String, int>> seatsTaken() {
+    return _rpc(() async {
+      final rows = await _c.rpc('list_event_seats');
+      return {
+        for (final r in (rows as List))
+          (r as Map)['event_id'].toString(): ((r['taken'] as num?) ?? 0).toInt(),
+      };
     });
   }
 
@@ -682,6 +696,9 @@ class DemoBackend implements Backend {
 
   @override
   Future<List<AdminPayment>> recentApprovedTickets() async => [];
+
+  @override
+  Future<Map<String, int>> seatsTaken() async => {};
 
   @override
   Future<List<AdminPayment>> allPayments() async => [

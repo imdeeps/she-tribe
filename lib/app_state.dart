@@ -31,8 +31,27 @@ class AppState extends ChangeNotifier {
   bool isAdmin = false;
   String? phone;
   String? whatsapp;
+  Map<String, int> seatsTakenByEvent = {};
   int tab = 0;
   String? error;
+
+  /// Seats still open for an event, or null when the event has no limit.
+  int? seatsLeft(TribeEvent e) {
+    final cap = e.capacity;
+    if (cap == null) return null;
+    final left = cap - (seatsTakenByEvent[e.id] ?? 0);
+    return left < 0 ? 0 : (left > cap ? cap : left);
+  }
+
+  /// "12 of 15 seats left", "Only 4 seats left" or "Sold out".
+  String? seatsLabel(TribeEvent e) {
+    final left = seatsLeft(e);
+    if (left == null) return null;
+    if (left == 0) return 'Sold out';
+    if (left == 1) return 'Only 1 seat left';
+    if (left <= 5) return 'Only $left seats left';
+    return '$left of ${e.capacity} seats left';
+  }
 
   bool get isMember => membership?.isActive ?? false;
   /// The member directory is only for the Annual plan, which is not open yet.
@@ -123,6 +142,8 @@ class AppState extends ChangeNotifier {
       backend.amIAdmin(),
       backend.myPhone(),
       backend.myWhatsapp(),
+      // If the seat count cannot load, the rest of the app still works.
+      backend.seatsTaken().catchError((Object _) => <String, int>{}),
     ]);
     events = r[0] as List<TribeEvent>;
     registrations = r[1] as List<Registration>;
@@ -145,6 +166,7 @@ class AppState extends ChangeNotifier {
     isAdmin = r[9] as bool;
     phone = r[10] as String?;
     whatsapp = r[11] as String?;
+    seatsTakenByEvent = r[12] as Map<String, int>;
     pending = isAdmin ? await backend.pendingPayments() : <AdminPayment>[];
     approvedTickets = isAdmin ? await backend.recentApprovedTickets() : <AdminPayment>[];
   }

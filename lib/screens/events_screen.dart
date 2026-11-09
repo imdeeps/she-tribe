@@ -160,7 +160,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         children: [
           Tag(formatDate(event.startsAt)),
           if (event.venue.isNotEmpty) Tag(event.venue),
-          if (event.capacity != null) Tag('${event.capacity} seats'),
+          if (event.capacity != null) Tag(app.seatsLabel(event) ?? '${event.capacity} seats'),
         ],
       ),
       DirectionsLink(venue: event.venue),
@@ -303,6 +303,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         onPressed: () => _openPay(open.id),
         child: Text(open.status == 'submitted' ? 'Awaiting confirmation' : 'Complete payment'),
       );
+    } else if (app.seatsLeft(event) == 0) {
+      action = const FilledButton(onPressed: null, child: Text('Sold out'));
     } else {
       action = FilledButton(
         onPressed: _busy ? null : () => _reserve(app, t),
