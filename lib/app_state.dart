@@ -93,6 +93,7 @@ class AppState extends ChangeNotifier {
           stage = AppStage.needsProfile;
         } else {
           await _loadData();
+          if (stage != AppStage.ready) _landOnMembership();
           stage = AppStage.ready;
         }
       }
@@ -194,6 +195,7 @@ class AppState extends ChangeNotifier {
     if (firstTime) Pixel.track('CompleteRegistration', onceKey: 'registered');
     profile = p;
     await _loadData();
+    _landOnMembership();
     stage = AppStage.ready;
     notifyListeners();
   }
@@ -225,6 +227,11 @@ class AppState extends ChangeNotifier {
     tab = 0;
     stage = AppStage.signedOut;
     notifyListeners();
+  }
+
+  /// Members land on the Membership page right after signing in (admins keep Home).
+  void _landOnMembership() {
+    tab = isAdmin ? 0 : 3;
   }
 
   void _trackCheckout(PaymentRequest p) => Pixel.track('InitiateCheckout',
