@@ -117,12 +117,27 @@ class _MembershipScreenState extends State<MembershipScreen> {
         ),
       );
     }
+    // Tribe Brew includes a seat at the next event, so show the seats left.
+    TribeEvent? nextEvent;
+    for (final e in app.events) {
+      if (e.capacity != null) {
+        nextEvent = e;
+        break;
+      }
+    }
+    final seatNote = (plan.code == 'cafe' && nextEvent != null) ? app.seatsLabel(nextEvent) : null;
+    final soldOut = plan.code == 'cafe' &&
+        nextEvent != null &&
+        app.seatsLeft(nextEvent) == 0 &&
+        app.registrationFor(nextEvent.id)?.status != 'paid';
     Widget action;
     if (open != null) {
       action = FilledButton(
         onPressed: () => _openPay(open.id),
         child: Text(open.status == 'submitted' ? 'Awaiting confirmation' : 'Complete payment'),
       );
+    } else if (soldOut) {
+      action = const FilledButton(onPressed: null, child: Text('Sold out'));
     } else if (Config.membershipPurchaseAllowed) {
       action = FilledButton(
         onPressed: _busy ? null : () => _subscribe(plan),
@@ -155,6 +170,10 @@ class _MembershipScreenState extends State<MembershipScreen> {
           ),
           const SizedBox(height: 6),
           for (final p in plan.perks) PerkRow(p),
+          if (seatNote != null) ...[
+            const SizedBox(height: 4),
+            Text(seatNote, style: Brand.body(15, weight: FontWeight.w700, color: Brand.accent)),
+          ],
           const SizedBox(height: 18),
           SizedBox(width: double.infinity, child: action),
         ],
