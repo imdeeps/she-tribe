@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -10,6 +11,7 @@ import 'events_screen.dart';
 import 'home_screen.dart';
 import 'me_screen.dart';
 import 'membership_screen.dart';
+import 'pay_screen.dart';
 
 class Shell extends StatefulWidget {
   const Shell({super.key});
@@ -23,6 +25,19 @@ class _ShellState extends State<Shell> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // A link like https://app.shetribe.in/?pay=1 (from a reminder email) opens the
+    // member's unfinished payment, so she can scan the QR or open her UPI app straight away.
+    if (kIsWeb && !Config.isDemo && Uri.base.queryParameters['pay'] != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final open = context.read<AppState>().payments.where((p) => p.status == 'awaiting').toList();
+        if (open.isEmpty) return;
+        open.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(builder: (_) => PayScreen(paymentId: open.first.id)),
+        );
+      });
+    }
   }
 
   @override
