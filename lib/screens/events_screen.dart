@@ -216,11 +216,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         ResponsiveWrap(
           minItemWidth: 250,
           children: [
-            // Early Bird is replaced by Tribe Brew (unless she already holds an Early Bird seat).
+            // Early Bird is retired and replaced by Tribe Brew.
             _brewCard(app),
             for (final t in event.tiers)
-              if (t.name != 'Early Bird' || (reg != null && reg.tierId == t.id))
-                _tierCard(app, event, t, reg),
+              if (t.name != 'Early Bird') _tierCard(app, event, t, reg),
           ],
         ),
     ];
