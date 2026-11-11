@@ -43,15 +43,8 @@ class AppState extends ChangeNotifier {
     return left < 0 ? 0 : (left > cap ? cap : left);
   }
 
-  /// "12 of 15 seats left", "Only 4 seats left" or "Sold out".
-  String? seatsLabel(TribeEvent e) {
-    final left = seatsLeft(e);
-    if (left == null) return null;
-    if (left == 0) return 'Sold out';
-    if (left == 1) return 'Only 1 seat left';
-    if (left <= 5) return 'Only $left seats left';
-    return '$left of ${e.capacity} seats left';
-  }
+  /// Seat counts are no longer shown publicly; only "Sold out" appears, once every seat is taken.
+  String? seatsLabel(TribeEvent e) => seatsLeft(e) == 0 ? 'Sold out' : null;
 
   bool get isMember => membership?.isActive ?? false;
   /// The member directory is only for the Annual plan, which is not open yet.
