@@ -140,6 +140,10 @@ class TribeEvent {
   final int? capacity;
   final List<TicketTier> tiers;
 
+  /// True once the event's 2-hour slot is over.
+  bool get hasEnded =>
+      startsAt != null && DateTime.now().isAfter(startsAt!.add(const Duration(hours: 2)));
+
   const TribeEvent({
     required this.id,
     required this.title,

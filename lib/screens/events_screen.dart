@@ -158,9 +158,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         spacing: 8,
         runSpacing: 8,
         children: [
+          if (event.hasEnded) const Tag('Event ended'),
           Tag(formatDate(event.startsAt)),
           if (event.venue.isNotEmpty) Tag(event.venue),
-          if (event.capacity != null) Tag(app.seatsLabel(event) ?? '${event.capacity} seats'),
+          if (event.capacity != null && !event.hasEnded)
+            Tag(app.seatsLabel(event) ?? '${event.capacity} seats'),
         ],
       ),
       DirectionsLink(venue: event.venue),
@@ -254,6 +256,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         onPressed: () => _openPay(open.id),
         child: Text(open.status == 'submitted' ? 'Awaiting confirmation' : 'Complete payment'),
       );
+    } else if (event.hasEnded && !hasSeat) {
+      action = const FilledButton(onPressed: null, child: Text('Event ended'));
     } else if (soldOut) {
       action = const FilledButton(onPressed: null, child: Text('Sold out'));
     } else {
@@ -325,6 +329,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         onPressed: () => _openPay(open.id),
         child: Text(open.status == 'submitted' ? 'Awaiting confirmation' : 'Complete payment'),
       );
+    } else if (event.hasEnded) {
+      action = const FilledButton(onPressed: null, child: Text('Event ended'));
     } else if (app.seatsLeft(event) == 0) {
       action = const FilledButton(onPressed: null, child: Text('Sold out'));
     } else {

@@ -101,7 +101,7 @@ class _NextEventCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Tag(registered ? 'You\u2019re registered' : 'Next event',
+          Tag(event.hasEnded ? 'Event ended' : (registered ? 'You\u2019re registered' : 'Next event'),
               bg: Brand.accent, fg: Colors.white),
           const SizedBox(height: 14),
           Text(event.title, style: Brand.display(30, weight: FontWeight.w700, height: 1.1)),
@@ -113,7 +113,7 @@ class _NextEventCard extends StatelessWidget {
               child: Text(event.venue, style: Brand.body(16)),
             ),
           DirectionsLink(venue: event.venue),
-          if (event.capacity != null)
+          if (event.capacity != null && !event.hasEnded)
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Text(
@@ -121,6 +121,10 @@ class _NextEventCard extends StatelessWidget {
                   style: Brand.body(16, weight: FontWeight.w600)),
             ),
           const SizedBox(height: 18),
+          if (event.hasEnded && !registered)
+            Text('This event has ended. Thank you to everyone who joined us.',
+                style: Brand.body(16, weight: FontWeight.w600))
+          else
           FilledButton(
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
